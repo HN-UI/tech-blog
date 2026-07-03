@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* BLOG_PLAN.md 팔레트 */
+  --border-outer: #3868c8;
+  --border-inner: #a8c4ee;
+  --card-outer: #d9556e;
+  --card-inner: #f3b3c0;
+  --dock-black: rgba(0, 0, 0, 0.72);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-pixel: var(--font-pokemon-pixel);
+  --font-body: var(--font-noto-sans-kr);
+
+  --color-border-outer: var(--border-outer);
+  --color-border-inner: var(--border-inner);
+  --color-card-outer: var(--card-outer);
+  --color-card-inner: var(--card-inner);
+  --color-dock-black: var(--dock-black);
+
+  --animate-bob: bob 3s ease-in-out infinite;
+
+  @keyframes bob {
+    0%,
+    100% {
+      margin-bottom: 0px;
+    }
+    50% {
+      margin-bottom: 6px;
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.bg-grass-tile-placeholder {
+  background-color: #7ec850;
+  background-image: radial-gradient(
+      circle at 4px 5px,
+      #5fa838 2px,
+      transparent 2.5px
+    ),
+    radial-gradient(circle at 13px 11px, #8fd666 2px, transparent 2.5px),
+    radial-gradient(circle at 9px 16px, #5fa838 1.5px, transparent 2px);
+  background-size: 20px 20px;
+}
