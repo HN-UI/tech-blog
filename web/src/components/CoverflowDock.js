@@ -32,7 +32,7 @@ export default function CoverflowDock() {
           <span className="flex h-20 w-20 items-center justify-center rounded-xl border-[3px] border-border-outer bg-white text-4xl transition-shadow group-hover:border-card-inner group-hover:shadow-[0_0_0_4px_rgba(217,85,110,0.35)]">
             {item.icon}
           </span>
-          <span className="font-body text-[11px] font-medium text-white">
+          <span className="font-pixel text-[30px] font-medium text-white">
             {item.label}
           </span>
         </button>
