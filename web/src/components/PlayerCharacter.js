@@ -14,7 +14,7 @@ const SPEED = 5; // 프레임당 이동 거리(px) — 키우면 빠르게
 const FRAME_MS = 130; // 걸음 프레임 전환 간격(ms) — 줄이면 발이 빨리 움직임
 
 // 방향별 보유 프레임 수. up 걷기 프레임(base_up_1/2)을 추가하면 up 값을 3으로 바꾸세요.
-const FRAME_COUNT = { down: 3, up: 1, left: 3, right: 3 };
+const FRAME_COUNT = { down: 3, up: 3, left: 3, right: 3 };
 
 // 걸음 순환 패턴 (정지 → 왼발 → 정지 → 오른발)
 function walkCycle(dir) {
@@ -36,6 +36,20 @@ const KEY_DIR = {
 };
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+// 캐릭터 충돌 박스: 스프라이트(DISPLAY) 안에서 실제 몸통 영역 비율.
+// 발 근처(아래쪽 가운데)만 잡아서, 머리 위 여백 등으로 어색하게 막히지 않게 함.
+const HITBOX = { left: 0.3, right: 0.3, top: 0.5, bottom: 0.08 };
+function playerBox(px, py) {
+  return {
+    left: px + DISPLAY * HITBOX.left,
+    right: px + DISPLAY * (1 - HITBOX.right),
+    top: py + DISPLAY * HITBOX.top,
+    bottom: py + DISPLAY * (1 - HITBOX.bottom),
+  };
+}
+const overlap = (a, b) =>
+  a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 
 export default function PlayerCharacter() {
   const elRef = useRef(null);
@@ -103,8 +117,24 @@ export default function PlayerCharacter() {
           dy *= inv;
         }
         const p = posRef.current;
-        p.x = clamp(p.x + dx * SPEED, 0, window.innerWidth - DISPLAY);
-        p.y = clamp(p.y + dy * SPEED, 0, window.innerHeight - DISPLAY);
+        const maxX = window.innerWidth - DISPLAY;
+        const maxY = window.innerHeight - DISPLAY;
+
+        // 현재 프레임의 장애물 목록 (실제 렌더된 위치 그대로 읽음)
+        const solids = [];
+        document
+          .querySelectorAll("[data-solid]")
+          .forEach((el) => solids.push(el.getBoundingClientRect()));
+        const blocked = (nx, ny) => {
+          const box = playerBox(nx, ny);
+          return solids.some((r) => overlap(box, r));
+        };
+
+        // 축을 분리해 검사 → 벽에 막혀도 다른 축으로는 미끄러지듯 이동
+        const nx = clamp(p.x + dx * SPEED, 0, maxX);
+        if (!blocked(nx, p.y)) p.x = nx;
+        const ny = clamp(p.y + dy * SPEED, 0, maxY);
+        if (!blocked(p.x, ny)) p.y = ny;
         applyPos();
       }
       raf = requestAnimationFrame(loop);

@@ -20,6 +20,7 @@ const SIZE = {
   fence_v: [8, 13],
   flower_orangeblue: [15, 15],
   flower_pinkwhite: [15, 15],
+  "208_full": [744, 672],
 };
 
 const s = (n) => n * SCALE;
@@ -87,6 +88,44 @@ function Garden({ x, y, cols, rows }) {
   return <>{pieces}</>;
 }
 
+// 단일 건물 등 큰 오브젝트. 표시 폭(w)만 지정하면 높이는 원본 비율로 자동 계산.
+// 모서리 고정 배치 지원 (right/top 지정 시 우측 상단 등에 고정)
+// solid = { top, right, bottom, left } (0~1, 각 변에서 안쪽으로 들어간 비율) 지정 시
+//   실제 벽 영역에 충돌 박스를 깔아 캐릭터가 못 지나가게 함 (PlayerCharacter가 읽음)
+function Building({ name, w, top = 0, left, right, solid }) {
+  const [nw, nh] = SIZE[name];
+  const width = w ?? nw;
+  const height = (width * nh) / nw; // 원본 비율 유지
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top,
+        ...(right != null ? { right } : { left: left ?? 0 }),
+        width,
+        height,
+        backgroundImage: `url(${SPRITE}/${name}.png)`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: `${width}px ${height}px`,
+        imageRendering: "pixelated",
+      }}
+    >
+      {solid && (
+        <div
+          data-solid
+          style={{
+            position: "absolute",
+            top: `${solid.top * 100}%`,
+            left: `${solid.left * 100}%`,
+            right: `${solid.right * 100}%`,
+            bottom: `${solid.bottom * 100}%`,
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 // 가로 흙길 하나를 생성 (segments = 가운데 채움 반복 횟수)
 function DirtPath({ x, y, segments }) {
   const capLW = s(SIZE.dirt_cap_left[0]);
@@ -107,6 +146,16 @@ const SCENE = [
   { kind: "garden", x: 60, y: 90, cols: 6, rows: 4 },
   { kind: "path", x: 120, y: 470, segments: 12 },
   { kind: "garden", x: 180, y: 590, cols: 6, rows: 3 },
+  // 오른쪽 위 고정 배치 (right/top = 화면 우측·상단으로부터의 거리, w = 표시 폭·높이는 비율 자동)
+  // solid = 실제 건물 벽 영역 (이미지의 투명 여백·낙서는 제외). 이 안으로는 캐릭터가 못 들어감.
+  {
+    kind: "building",
+    name: "208_full",
+    w: 460,
+    top: 15,
+    right: 20,
+    solid: { top: 0.09, right: 0.04, bottom: 0.07, left: 0.04 },
+  },
 ];
 
 export default function GardenScene() {
@@ -115,6 +164,7 @@ export default function GardenScene() {
       {SCENE.map((o, i) => {
         if (o.kind === "garden") return <Garden key={i} {...o} />;
         if (o.kind === "path") return <DirtPath key={i} {...o} />;
+        if (o.kind === "building") return <Building key={i} {...o} />;
         return null;
       })}
     </div>
