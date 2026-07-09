@@ -10,6 +10,14 @@
   --card-outer: #d9556e;
   --card-inner: #f3b3c0;
   --dock-black: rgba(0, 0, 0, 0.72);
+
+  /* 픽셀 윈도우(팝업) 팔레트 */
+  --paper: #fdf3e0; /* 종이 배경 */
+  --wood: #8b5a34; /* 타이틀 바 나무색 */
+  --wood-hover: #a3703f; /* 타이틀 바 호버 */
+  --ink: #6b4a30; /* 본문 글씨 */
+  --plate: #fefad8; /* 타이틀 바 가운데 이름표 (아주 연한 노란색) */
+  --plate-soft: #ffffff; /* 본문 정보 박스 (plate 보다 더 흰색) */
 }
 
 @theme inline {
@@ -17,12 +25,19 @@
   --color-foreground: var(--foreground);
   --font-pixel: var(--font-pokemon-pixel);
   --font-body: var(--font-noto-sans-kr);
+  --font-paperlogy: var(--font-paperlogy-medium); /* Paperlogy Medium(5) */
 
   --color-border-outer: var(--border-outer);
   --color-border-inner: var(--border-inner);
   --color-card-outer: var(--card-outer);
   --color-card-inner: var(--card-inner);
   --color-dock-black: var(--dock-black);
+  --color-paper: var(--paper);
+  --color-wood: var(--wood);
+  --color-wood-hover: var(--wood-hover);
+  --color-ink: var(--ink);
+  --color-plate: var(--plate);
+  --color-plate-soft: var(--plate-soft);
 
   --animate-bob: bob 3s ease-in-out infinite;
 
@@ -61,8 +76,31 @@ body {
   background-size: 20px 20px;
 }
 
-.bg-grass-tile {
+@utility bg-grass-tile {
   background-image: url("/textures/grass-tile.png");
   background-repeat: repeat;
   background-size: 128px 128px;
+}
+
+/* 도트 테두리 픽셀 윈도우 — border-image 9-slice라 창 크기가 바뀌어도 안 깨짐 */
+.pixel-window {
+  /* 종이 줄무늬(stripe) 조절값 — 여기 두 개만 바꾸면 됨 */
+  --stripe-color: rgba(139, 90, 52, 0.08);
+  --stripe-thickness: 4px; /* 줄 두께 (키우면 줄이 굵어짐) */
+  --stripe-gap: 10px; /* 줄 간격/주기 (키우면 줄이 덜 자주 나옴) */
+  --border-thickness: 12px; /* 도트 테두리 두께 (키우면 두꺼워짐) */
+
+  border-radius: 12px;
+  border: var(--border-thickness) solid transparent;
+  border-image: url("/textures/window-border.png") 12 / var(--border-thickness) stretch;
+  background-color: var(--paper);
+  background-image: repeating-linear-gradient(
+    0deg,
+    var(--stripe-color) 0,
+    var(--stripe-color) var(--stripe-thickness),
+    transparent var(--stripe-thickness),
+    transparent var(--stripe-gap)
+  );
+  /* 배경을 테두리 안쪽(padding-box)까지만 그려 border-image 밖으로 새지 않게 */
+  background-clip: padding-box;
 }

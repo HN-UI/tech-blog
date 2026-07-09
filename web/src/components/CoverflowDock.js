@@ -2,6 +2,9 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import DraggableWindow from "./DraggableWindow";
+import { PANELS } from "./panels";
+
 const DOCK_ITEMS = [
   { key: "folder", label: "Photos", image: "/sprites/icon/camera.png", imgClass: "h-24 w-24 object-bottom -mb-1" },
   { key: "report", label: "Report", image: "/sprites/icon/report.png", imgClass: "h-24 w-24 object-bottom -mb-1" },
@@ -47,54 +50,11 @@ export default function CoverflowDock() {
   const [open, setOpen] = useState(true); // M 키로 열고 닫기
   const [active, setActive] = useState(Math.floor(N / 2)); // 가운데로 올 아이템
   const [panel, setPanel] = useState(null); // 열려 있는 팝업 아이템 key (없으면 null)
-  const [pos, setPos] = useState({ x: 0, y: 0 }); // 창의 좌상단 위치(px)
-
-  const winRef = useRef(null);
 
   // 아이템 클릭: 가운데가 아니면 가운데로, 이미 가운데면 팝업 열기
   const onItemClick = (index, item) => {
     if (index !== active) setActive(index);
     else if (item.panel) setPanel(item.key);
-  };
-
-  // 창을 열 때 화면 가운데 살짝 위쪽에 배치
-  useLayoutEffect(() => {
-    if (!panel) return;
-    const w = winRef.current;
-    const ww = w?.offsetWidth ?? 512;
-    const wh = w?.offsetHeight ?? 300;
-    setPos({
-      x: Math.max(8, (window.innerWidth - ww) / 2),
-      y: Math.max(8, window.innerHeight / 2 - wh / 2 - 60),
-    });
-  }, [panel]);
-
-  // 헤더(타이틀 바)를 잡고 드래그 → 창 이동 (화면 밖으로 완전히 나가지 않게 제한)
-  const onDragStart = (e) => {
-    e.preventDefault();
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const orig = { ...pos };
-    const el = winRef.current;
-    const ww = el?.offsetWidth ?? 512;
-    const wh = el?.offsetHeight ?? 300;
-
-    const onMove = (ev) => {
-      const nx = orig.x + (ev.clientX - startX);
-      const ny = orig.y + (ev.clientY - startY);
-      const maxX = window.innerWidth - Math.min(ww, 80); // 최소 80px는 화면 안에 남김
-      const maxY = window.innerHeight - Math.min(wh, 48);
-      setPos({
-        x: Math.min(maxX, Math.max(-(ww - 80), nx)),
-        y: Math.min(maxY, Math.max(0, ny)),
-      });
-    };
-    const onUp = () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-    };
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
   };
 
   const btnRefs = useRef([]);
@@ -198,34 +158,15 @@ export default function CoverflowDock() {
       </span>
     </nav>
 
-    {/* 드래그 가능한 윈도우 창 (배경 어둡게 없음). ESC / X 로 닫힘. 디자인은 임시 */}
-    {panelItem && (
-      <div
-        ref={winRef}
-        className="fixed z-50 flex min-h-[300px] w-[90%] max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
-        style={{ left: pos.x, top: pos.y }}
-      >
-        {/* 타이틀 바 = 드래그 핸들 */}
-        <div
-          onPointerDown={onDragStart}
-          className="flex cursor-move select-none items-center justify-between bg-gray-100 px-4 py-2"
-        >
-          <h2 className="font-pixel text-xl font-bold">{panelItem.label}</h2>
-          <button
-            type="button"
-            onClick={() => setPanel(null)}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-lg text-gray-500 hover:bg-gray-200"
-            aria-label="닫기"
-          >
-            ✕
-          </button>
-        </div>
-        <div className="flex-1 p-6">
-          <p className="text-gray-500">여기에 프로필 내용이 들어갑니다.</p>
-        </div>
-      </div>
-    )}
+    {panelItem && (() => {
+      // 창 제목/본문은 panels.js 에서 가져옴 (없으면 독 라벨을 제목으로)
+      const content = PANELS[panelItem.key];
+      return (
+        <DraggableWindow title={content?.title ?? panelItem.label} plate={content?.plate} onClose={() => setPanel(null)}>
+          {content?.body}
+        </DraggableWindow>
+      );
+    })()}
     </>
   );
 }
