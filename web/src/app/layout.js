@@ -31,13 +31,17 @@ export const metadata = {
   description: "레트로 게임 UI 느낌의 개인 테크 블로그",
 };
 
-export default function RootLayout({ children }) {
+// report = @report 슬롯 (Report 전체화면 오버레이). 홈에 있을 땐 default.js 가 null 을 그림
+export default function RootLayout({ children, report }) {
   return (
     <html
       lang="ko"
       className={`${pokemonPixel.variable} ${paperlogy.variable} ${notoSansKR.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-body">{children}</body>
+      <body className="min-h-full flex flex-col font-body">
+        {children}
+        {report}
+      </body>
     </html>
   );
 }

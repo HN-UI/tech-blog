@@ -82,6 +82,77 @@ body {
   background-size: 128px 128px;
 }
 
+/* 마크다운 본문(PostView) — content/*.md 가 렌더된 HTML 의 생김새.
+   Report 화면 톤에 맞춰 검은 선 + 흰 바탕 */
+.markdown {
+  font-family: var(--font-paperlogy);
+  color: #262626; /* neutral-800 */
+  line-height: 2;
+}
+.markdown h2 {
+  font-family: var(--font-pokemon-pixel);
+  font-size: 1.5rem;
+  color: #000;
+  margin: 2.5rem 0 0.75rem;
+}
+.markdown h3 {
+  font-family: var(--font-pokemon-pixel);
+  font-size: 1.25rem;
+  color: #000;
+  margin: 2rem 0 0.5rem;
+}
+.markdown p {
+  margin: 1rem 0;
+}
+.markdown strong {
+  font-weight: 700;
+  color: #000;
+}
+.markdown a {
+  text-decoration: underline;
+}
+.markdown ul,
+.markdown ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+.markdown ul {
+  list-style: disc;
+}
+.markdown ol {
+  list-style: decimal;
+}
+.markdown li {
+  margin: 0.35rem 0;
+}
+.markdown blockquote {
+  margin: 1.5rem 0;
+  border-left: 4px solid #000;
+  background: #fafafa;
+  padding: 0.75rem 1rem 0.75rem 1.25rem;
+  font-style: italic;
+  color: #404040;
+}
+.markdown pre {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  border: 2px solid #000;
+  border-radius: 0.5rem;
+  background: #fafafa;
+  padding: 1rem;
+  line-height: 1.6;
+}
+.markdown code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875rem;
+}
+/* 문단 안에 섞인 인라인 코드만 배경을 줌 (pre 안쪽은 제외) */
+.markdown :not(pre) > code {
+  border-radius: 0.25rem;
+  background: #f5f5f5;
+  padding: 0.1rem 0.3rem;
+}
+
 /* 도트 테두리 픽셀 윈도우 — border-image 9-slice라 창 크기가 바뀌어도 안 깨짐 */
 .pixel-window {
   /* 종이 줄무늬(stripe) 조절값 — 여기 두 개만 바꾸면 됨 */

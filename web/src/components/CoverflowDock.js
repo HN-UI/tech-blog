@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import DraggableWindow from "./DraggableWindow";
@@ -7,7 +8,7 @@ import { PANELS } from "./panels";
 
 const DOCK_ITEMS = [
   { key: "folder", label: "Photos", image: "/sprites/icon/camera.png", imgClass: "h-24 w-24 object-bottom -mb-1" },
-  { key: "report", label: "Report", image: "/sprites/icon/report.png", imgClass: "h-24 w-24 object-bottom -mb-1" },
+  { key: "report", label: "Report", image: "/sprites/icon/report.png", imgClass: "h-24 w-24 object-bottom -mb-1", href: "/report" },
   { key: "profile", label: "Profile", image: "/sprites/icon/profile.png", imgClass: "h-40 w-40 object-bottom -mb-9", panel: true },
   { key: "project", label: "Projects", image: "/sprites/icon/project.png", imgClass: "h-24 w-24" },
   { key: "research", label: "Research", image: "/sprites/icon/research.png", imgClass: "h-30 w-30 object-bottom -mb-4" },
@@ -47,14 +48,19 @@ function shortestDelta(d) {
 }
 
 export default function CoverflowDock() {
+  const router = useRouter();
   const [open, setOpen] = useState(true); // M 키로 열고 닫기
   const [active, setActive] = useState(Math.floor(N / 2)); // 가운데로 올 아이템
   const [panel, setPanel] = useState(null); // 열려 있는 팝업 아이템 key (없으면 null)
 
-  // 아이템 클릭: 가운데가 아니면 가운데로, 이미 가운데면 팝업 열기
+  // 아이템 클릭: 가운데가 아니면 가운데로, 이미 가운데면
+  //  - href 가 있으면 그 라우트로 이동 (Report = 전체화면)
+  //  - panel 이 있으면 팝업 토글 (Profile = 드래그 창)
   const onItemClick = (index, item) => {
-    if (index !== active) setActive(index);
-    else if (item.panel) setPanel(item.key);
+    if (index !== active) return setActive(index);
+    if (item.href) return router.push(item.href);
+    if (!item.panel) return;
+    setPanel((cur) => (cur === item.key ? null : item.key));
   };
 
   const btnRefs = useRef([]);

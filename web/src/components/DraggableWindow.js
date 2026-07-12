@@ -11,6 +11,10 @@ const BAR_HEIGHT = "112px"; // 바 두께
 // 본문이 시작하는 위치 — 바와 별개로 직접 지정
 const CONTENT_TOP = "140px"; // 창 위 테두리에서 떨어진 거리
 
+// 창이 처음 열릴 때 나타나는 위치 — 화면 정가운데 기준 오프셋(px)
+const SPAWN_OFFSET_X = 0; // 키우면 오른쪽으로
+const SPAWN_OFFSET_Y = -160; // 키우면 아래로 (음수면 위로)
+
 export default function DraggableWindow({ title, plate, onClose, children }) {
   const winRef = useRef(null);
   const [pos, setPos] = useState({ x: 0, y: 0 }); // 창의 좌상단 위치(px)
@@ -21,8 +25,8 @@ export default function DraggableWindow({ title, plate, onClose, children }) {
     const ww = el?.offsetWidth ?? 672;
     const wh = el?.offsetHeight ?? 450;
     setPos({
-      x: Math.max(8, (window.innerWidth - ww) / 2),
-      y: Math.max(8, window.innerHeight / 2 - wh / 2 - 60),
+      x: Math.max(8, (window.innerWidth - ww) / 2 + SPAWN_OFFSET_X),
+      y: Math.max(8, (window.innerHeight - wh) / 2 + SPAWN_OFFSET_Y),
     });
   }, []);
 
